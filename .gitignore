@@ -53,3 +53,5 @@ Pods/
 
 gem_dep/
 .bundle
+
+Scripts/publish_output
