@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "BRUIKit"
-  s.version      = "1.0"
+  s.version      = "1.0.0"
   s.summary      = "iOS library"
   s.homepage     = "https://github.com/ElieMelki"
   s.author       = { "Elie Melki" => "elie.j.melki@gmail.com" }
@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/ElieMelki/BRUIKit.git" , :tag => s.version }
   s.source_files =  'BRUIKit/Classes/**/*.swift'
   s.ios.deployment_target = '9.0'
-  s.frameworks = 'Foundation' 'UIKit'
+  s.frameworks = 'Foundation', 'UIKit'
   s.requires_arc = true
   s.license      = {
     :type => 'Copyright',
