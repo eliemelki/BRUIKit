@@ -75,7 +75,9 @@ open class UINibView : UIView {
         self.backgroundColor = UIColor.clear
     }
 
-    
+    //If you dont specify a nibname the class will try to assign the nibname as the view class name and with use the bundle that the view class was created on.
+    //If you want to load a different nib that has a different name than the class in the same bundle as the view class, you can specify the name.
+    //If you want to load a different nib that is in a different bundle, you will need to specify the bundle/framework id along with the nibname. E.g BR.BRUIkit.nibname
     @IBInspectable
     open var nibname: String? {
         didSet {

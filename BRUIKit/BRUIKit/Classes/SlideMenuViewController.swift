@@ -7,9 +7,17 @@
 
 import UIKit
 
+/**
+ * @SlideMenuViewController flexible slide menu.
+ * If used within a storboard make sure to create SlideMainControllerSegue and SlideMenuControllerSegue.
+ * The segue should have identifier "main" and "menu" respectively. Anytime you need to replace the main controller you can execute SlideMainControllerSegue with identifier main.
+ * You can also change main content programtically by calling @setMainController
+ * From any main or menu ViewController you can call slideMenuController property to have reference to SlideMenuViewController. This can return nil, if you are not within.
+**/
+
 open class SlideMenuViewController: UIViewController{
     
-    
+    // MARK: UI Properties
     fileprivate var sideViewController:UIViewController = UIViewController()
     fileprivate var mainViewController:UIViewController = UIViewController()
     
@@ -20,6 +28,8 @@ open class SlideMenuViewController: UIViewController{
     
     private var leftContentView:UIView!
     private var leftOverlayView:UIView!
+    
+    // MARK: Configuration Properties
     
     private(set) var isOpened = false
     
@@ -32,10 +42,10 @@ open class SlideMenuViewController: UIViewController{
         }
     }
     
-    
-    //Configuration
-    
+    //Can be set to disable automatic menu close on main content change.
     @IBInspectable open var automaticallyHideMenuOnMainChange: Bool = true
+    
+    //Can be set to hide the menu icon at all time.
     @IBInspectable open var menuIconVisible: Bool = true {
         didSet {
             if let icon = self.menuIconButton {
@@ -43,19 +53,13 @@ open class SlideMenuViewController: UIViewController{
             }
         }
     }
-    
+    //define transition animation when replacing main view controller. You can override `AnimationTransition` protocol and set the property to change the behaviour.
     open var mainViewControllerAnimationTransition:AnimationTransition = SlideMenuMainAnimationTransition()
     
-    //Init
+    // MARK: Init
     
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-    }
-    
-    open override func awakeFromNib() {
-        super.awakeFromNib()
-        self.performSegue(withIdentifier: "main", sender: nil)
-        self.performSegue(withIdentifier: "menu", sender: nil)
     }
     
     
@@ -66,13 +70,24 @@ open class SlideMenuViewController: UIViewController{
         super.init(nibName: nil, bundle: nil)
     }
     
-
+    // MARK: ViewController Methods
+    
+    open override func awakeFromNib() {
+        super.awakeFromNib()
+        self.performSegue(withIdentifier: "main", sender: nil)
+        self.performSegue(withIdentifier: "menu", sender: nil)
+    }
+    
+    
     open override func viewDidLoad() {
         super.viewDidLoad()
         self.setupUI()
         self.setupGesture()
     }
     
+    // MARK: Public Methods
+    
+    //Close slide menu.
     open func closeSlide() {
         guard isOpened else {
             return
@@ -90,6 +105,7 @@ open class SlideMenuViewController: UIViewController{
         
     }
     
+    //Open slide menu.
     open func openSlide() {
         guard !isOpened else {
             return
@@ -107,6 +123,7 @@ open class SlideMenuViewController: UIViewController{
        
     }
     
+   //Toogle slide menu.
     @objc open func toogleSlide() {
         if (isOpened) {
             closeSlide()
@@ -115,6 +132,7 @@ open class SlideMenuViewController: UIViewController{
         }
     }
     
+    //Change Main ViewController content.
     open func setMainController(to viewController:UIViewController, animated: Bool = false,  completionHandler: @escaping () -> Void = {}) {
         
         if (viewController == self.mainViewController) {
@@ -138,6 +156,8 @@ open class SlideMenuViewController: UIViewController{
 
         }
     }
+    
+    // MARK: Private Methods
     
     private func didAddMainController(viewController:UIViewController) {
         self.mainViewController = viewController
@@ -249,6 +269,20 @@ open class SlideMenuViewController: UIViewController{
         }
     }
    
+    private func addController(controller: UIViewController, inView: UIView) {
+        controller.willMove(toParent: self)
+        self.addChild(controller)
+        controller.view.pin(toView: inView)
+        controller.didMove(toParent: self)
+    }
+    private func removeController(content: UIViewController) {
+        content.willMove(toParent: nil)
+        content.view.removeFromSuperview()
+        content.removeFromParent()
+        content.didMove(toParent: nil)
+    }
+    
+    // MARK: Action Methods
     
     @objc private func didTapOverlayView() {
         self.closeSlide()
@@ -266,26 +300,12 @@ open class SlideMenuViewController: UIViewController{
     @objc  func didSwipeRight() {
         self.openSlide()
     }
-    
-    private func addController(controller: UIViewController, inView: UIView) {
-        controller.willMove(toParent: self)
-        self.addChild(controller)
-        controller.view.pin(toView: inView)
-        controller.didMove(toParent: self)
-    }
-    private func removeController(content: UIViewController) {
-        content.willMove(toParent: nil)
-        content.view.removeFromSuperview()
-        content.removeFromParent()
-        content.didMove(toParent: nil)
-    }
-    
-    deinit {
-       
-    }
-    
 }
 
+
+// MARK: Extensions.
+
+//Adding slideMenuController property to reference the SlideMenuViewController.
 private var slideMenuControllerKey: UInt8 = 0
 public extension UIViewController {
     fileprivate(set) var slideMenuController: SlideMenuViewController? {
@@ -298,8 +318,9 @@ public extension UIViewController {
     }
 }
 
+// MARK: Segues.
 
-
+//SlideMainControllerSegue segue used in Storyboard to set the MainViewController
 open class SlideMainControllerSegue : UIStoryboardSegue {
   
     override open func perform() {
@@ -318,6 +339,8 @@ open class SlideMainControllerSegue : UIStoryboardSegue {
         }
     }
 }
+
+//SlideMenuControllerSegue segue used in Storyboard to set the Menu
 open class SlideMenuControllerSegue : UIStoryboardSegue {
 
     override open func perform() {
@@ -334,6 +357,8 @@ open class SlideMenuControllerSegue : UIStoryboardSegue {
     }
 }
 
+// MARK: Animation.
+//SlideMenuMainAnimationTransition conforms to AnimationTransition protocol which implements the replace main controller animation.
 class SlideMenuMainAnimationTransition: AnimationTransition {
     func animateTransition(from: UIView, to: UIView, completionHandler: @escaping () -> Void) {
         let duration = 0.5
