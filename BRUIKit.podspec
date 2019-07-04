@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "BRUIKit"
-  s.version      = "1.0.0"
+  s.version      = "1.0.1"
   s.summary      = "iOS library"
   s.homepage     = "https://github.com/ElieMelki"
   s.author       = { "Elie Melki" => "elie.j.melki@gmail.com" }
